@@ -22,6 +22,12 @@
       }
     },
     {
+      "files": "package-lock.json",
+      "options": {
+        "parser": "json"
+      }
+    },
+    {
       "files": "*.md",
       "options": {
         "printWidth": 100,

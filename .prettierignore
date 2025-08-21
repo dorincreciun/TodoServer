@@ -1,0 +1,44 @@
+# Dependențe
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build artifacts
+dist/
+build/
+coverage/
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env*
+
+# Docker
+Dockerfile
+docker-compose*.yml
+
+# Config files that shouldn't be formatted
+*.config.js
+jest.config.js
+.eslintrc.js
+.prettierrc
+.prettierignore
+
+# Documentation
+README.md
+API_DOCUMENTATION.md
+PROJECT_ANALYSIS.md
+
+# Monitoring
+monitoring/
+
+# Scripts
+scripts/
+
+# Test files
+test/
+
+# GitHub workflows
+.github/
