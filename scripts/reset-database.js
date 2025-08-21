@@ -20,7 +20,7 @@ const resetDatabase = async () => {
 
     // Obține toate colecțiile
     const collections = await mongoose.connection.db.listCollections().toArray();
-    
+
     // Șterge toate colecțiile
     for (const collection of collections) {
       await mongoose.connection.db.dropCollection(collection.name);

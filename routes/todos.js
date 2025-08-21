@@ -11,17 +11,14 @@ const {
   markAsCompleted,
   markAsInProgress,
   cancelTodo,
-  getStats
+  getStats,
 } = require('../controllers/todoController');
 
 const router = express.Router();
 
 // Validare pentru creare todo
 const createTodoValidation = [
-  body('title')
-    .isLength({ min: 1, max: 200 })
-    .withMessage('Titlul trebuie să aibă între 1 și 200 de caractere')
-    .trim(),
+  body('title').isLength({ min: 1, max: 200 }).withMessage('Titlul trebuie să aibă între 1 și 200 de caractere').trim(),
   body('description')
     .optional()
     .isLength({ max: 1000 })
@@ -31,30 +28,15 @@ const createTodoValidation = [
     .optional()
     .isIn(['low', 'medium', 'high', 'urgent'])
     .withMessage('Prioritatea trebuie să fie low, medium, high sau urgent'),
-  body('dueDate')
-    .optional()
-    .isISO8601()
-    .withMessage('Data de scadență trebuie să fie în format ISO 8601'),
-  body('tags')
-    .optional()
-    .isArray()
-    .withMessage('Tag-urile trebuie să fie un array'),
-  body('tags.*')
-    .optional()
-    .isLength({ max: 20 })
-    .withMessage('Fiecare tag nu poate depăși 20 de caractere')
-    .trim(),
-  body('isPublic')
-    .optional()
-    .isBoolean()
-    .withMessage('isPublic trebuie să fie un boolean')
+  body('dueDate').optional().isISO8601().withMessage('Data de scadență trebuie să fie în format ISO 8601'),
+  body('tags').optional().isArray().withMessage('Tag-urile trebuie să fie un array'),
+  body('tags.*').optional().isLength({ max: 20 }).withMessage('Fiecare tag nu poate depăși 20 de caractere').trim(),
+  body('isPublic').optional().isBoolean().withMessage('isPublic trebuie să fie un boolean'),
 ];
 
 // Validare pentru actualizare todo
 const updateTodoValidation = [
-  param('id')
-    .isMongoId()
-    .withMessage('ID-ul todo-ului trebuie să fie un ID MongoDB valid'),
+  param('id').isMongoId().withMessage('ID-ul todo-ului trebuie să fie un ID MongoDB valid'),
   body('title')
     .optional()
     .isLength({ min: 1, max: 200 })
@@ -73,31 +55,14 @@ const updateTodoValidation = [
     .optional()
     .isIn(['low', 'medium', 'high', 'urgent'])
     .withMessage('Prioritatea trebuie să fie low, medium, high sau urgent'),
-  body('dueDate')
-    .optional()
-    .isISO8601()
-    .withMessage('Data de scadență trebuie să fie în format ISO 8601'),
-  body('tags')
-    .optional()
-    .isArray()
-    .withMessage('Tag-urile trebuie să fie un array'),
-  body('tags.*')
-    .optional()
-    .isLength({ max: 20 })
-    .withMessage('Fiecare tag nu poate depăși 20 de caractere')
-    .trim(),
-  body('isPublic')
-    .optional()
-    .isBoolean()
-    .withMessage('isPublic trebuie să fie un boolean')
+  body('dueDate').optional().isISO8601().withMessage('Data de scadență trebuie să fie în format ISO 8601'),
+  body('tags').optional().isArray().withMessage('Tag-urile trebuie să fie un array'),
+  body('tags.*').optional().isLength({ max: 20 }).withMessage('Fiecare tag nu poate depăși 20 de caractere').trim(),
+  body('isPublic').optional().isBoolean().withMessage('isPublic trebuie să fie un boolean'),
 ];
 
 // Validare pentru ID-uri
-const idValidation = [
-  param('id')
-    .isMongoId()
-    .withMessage('ID-ul trebuie să fie un ID MongoDB valid')
-];
+const idValidation = [param('id').isMongoId().withMessage('ID-ul trebuie să fie un ID MongoDB valid')];
 
 // Validare pentru query parameters
 const queryValidation = [
@@ -113,22 +78,13 @@ const queryValidation = [
     .optional()
     .isIn(['today', 'week', 'two_weeks', 'month', 'overdue'])
     .withMessage('Filtru de dată invalid'),
-  query('page')
-    .optional()
-    .isInt({ min: 1 })
-    .withMessage('Pagina trebuie să fie un număr întreg pozitiv'),
-  query('limit')
-    .optional()
-    .isInt({ min: 1, max: 100 })
-    .withMessage('Limita trebuie să fie între 1 și 100'),
+  query('page').optional().isInt({ min: 1 }).withMessage('Pagina trebuie să fie un număr întreg pozitiv'),
+  query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limita trebuie să fie între 1 și 100'),
   query('sortBy')
     .optional()
     .isIn(['title', 'priority', 'dueDate', 'status', 'createdAt', 'updatedAt'])
     .withMessage('Câmpul de sortare invalid'),
-  query('sortOrder')
-    .optional()
-    .isIn(['asc', 'desc'])
-    .withMessage('Ordinea de sortare trebuie să fie asc sau desc')
+  query('sortOrder').optional().isIn(['asc', 'desc']).withMessage('Ordinea de sortare trebuie să fie asc sau desc'),
 ];
 
 // Toate rutele necesită autentificare
@@ -645,4 +601,4 @@ router.patch('/:id/progress', idValidation, validate, markAsInProgress);
  */
 router.patch('/:id/cancel', idValidation, validate, cancelTodo);
 
-module.exports = router; 
+module.exports = router;

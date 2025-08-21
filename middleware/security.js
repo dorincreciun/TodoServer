@@ -1,13 +1,10 @@
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
-const Brute = require('express-brute');
-const BruteRedis = require('express-brute-redis');
 const hpp = require('hpp');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const helmet = require('helmet');
-const { logSecurityEvent, logError } = require('../config/logger');
-const redisClient = require('../config/redis');
+const { logSecurityEvent } = require('../config/logger');
 
 // Configurare rate limiting general
 const generalRateLimit = rateLimit({
@@ -20,14 +17,12 @@ const generalRateLimit = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
+  keyGenerator: req =>
     // Folosește IP-ul pentru utilizatorii anonimi
-    return req.ip;
-  },
-  skip: (req) => {
+    req.ip,
+  skip: req =>
     // Skip pentru health checks și documentație
-    return req.path === '/api/health' || req.path.startsWith('/api-docs');
-  },
+    req.path === '/api/health' || req.path.startsWith('/api-docs'),
   handler: (req, res) => {
     logSecurityEvent('RATE_LIMIT_EXCEEDED', {
       ip: req.ip,
@@ -54,10 +49,9 @@ const authRateLimit = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req) => {
+  keyGenerator: req =>
     // Folosește IP-ul pentru rate limiting pe autentificare
-    return `auth:${req.ip}`;
-  },
+    `auth:${req.ip}`,
   handler: (req, res) => {
     logSecurityEvent('AUTH_RATE_LIMIT_EXCEEDED', {
       ip: req.ip,
@@ -79,52 +73,59 @@ const slowDownMiddleware = slowDown({
   delayAfter: 50, // începe să încetinească după 50 de request-uri
   delayMs: 500, // adaugă 500ms la fiecare request după limita
   maxDelayMs: 20000, // maxim 20 secunde de întârziere
-  keyGenerator: (req) => req.ip,
-  skip: (req) => {
-    return req.path === '/api/health' || req.path.startsWith('/api-docs');
+  keyGenerator: req => req.ip,
+  skip: req => req.path === '/api/health' || req.path.startsWith('/api-docs'),
+});
+
+// Brute force protection custom (înlocuiește express-brute)
+const bruteForceProtection = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minute
+  max: 3, // doar 3 încercări
+  message: {
+    success: false,
+    message: 'Prea multe încercări eșuate. Vă rugăm încercați din nou mai târziu.',
+    code: 'BRUTE_FORCE_DETECTED',
   },
-});
-
-// Brute force protection pentru autentificare
-const bruteStore = new BruteRedis({
-  client: redisClient.client,
-  prefix: 'brute:',
-});
-
-const bruteForce = new Brute(bruteStore, {
-  freeRetries: 3,
-  minWait: 5 * 60 * 1000, // 5 minute
-  maxWait: 60 * 60 * 1000, // 1 oră
-  lifetime: 24 * 60 * 60 * 1000, // 24 ore
-  refreshTimeoutOnRequest: false,
-  failCallback: (req, res, next, nextValidRequestDate) => {
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: req => {
+    // Folosește email-ul pentru brute force protection
+    const email = req.body.email || req.body.username || req.ip;
+    return `brute:${email}`;
+  },
+  skip: req =>
+    // Skip pentru health checks și documentație
+    req.path === '/api/health' || req.path.startsWith('/api-docs'),
+  handler: (req, res) => {
+    const email = req.body.email || req.body.username || req.ip;
     logSecurityEvent('BRUTE_FORCE_DETECTED', {
       ip: req.ip,
       userAgent: req.get('User-Agent'),
-      email: req.body.email,
-      nextValidRequest: nextValidRequestDate,
+      email,
+      path: req.path,
     });
 
     res.status(429).json({
       success: false,
       message: 'Prea multe încercări eșuate. Vă rugăm încercați din nou mai târziu.',
       code: 'BRUTE_FORCE_DETECTED',
-      nextValidRequest: nextValidRequestDate,
+      retryAfter: Math.ceil((15 * 60 * 1000) / 1000 / 60), // 15 minute
     });
   },
 });
 
 // IP filtering custom (înlocuiește express-ipfilter)
 const ipFilter = (req, res, next) => {
-  const clientIP = req.headers['x-forwarded-for']?.split(',')[0] ||
-                   req.headers['x-real-ip'] ||
-                   req.connection.remoteAddress ||
-                   req.socket.remoteAddress ||
-                   req.ip;
+  const clientIP =
+    req.headers['x-forwarded-for']?.split(',')[0] ||
+    req.headers['x-real-ip'] ||
+    req.connection.remoteAddress ||
+    req.socket.remoteAddress ||
+    req.ip;
 
   // Lista de IP-uri permise (configurabilă prin environment variables)
   const allowedIPs = process.env.ALLOWED_IPS?.split(',') || [];
-  
+
   // Dacă nu sunt specificate IP-uri permise, permite toate
   if (allowedIPs.length === 0) {
     return next();
@@ -176,7 +177,7 @@ const helmetConfig = helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", 'data:', 'https:'],
       connectSrc: ["'self'"],
       fontSrc: ["'self'"],
       objectSrc: ["'none'"],
@@ -185,10 +186,10 @@ const helmetConfig = helmet({
     },
   },
   crossOriginEmbedderPolicy: false,
-  crossOriginOpenerPolicy: { policy: "same-origin" },
-  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginOpenerPolicy: { policy: 'same-origin' },
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
   dnsPrefetchControl: { allow: false },
-  frameguard: { action: "deny" },
+  frameguard: { action: 'deny' },
   hidePoweredBy: true,
   hsts: {
     maxAge: parseInt(process.env.HELMET_HSTS_MAX_AGE) || 31536000,
@@ -197,15 +198,15 @@ const helmetConfig = helmet({
   },
   ieNoOpen: true,
   noSniff: true,
-  permittedCrossDomainPolicies: { permittedPolicies: "none" },
-  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+  permittedCrossDomainPolicies: { permittedPolicies: 'none' },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   xssFilter: true,
 });
 
 // Middleware pentru verificarea User-Agent
 const userAgentCheck = (req, res, next) => {
   const userAgent = req.get('User-Agent');
-  
+
   if (!userAgent) {
     logSecurityEvent('MISSING_USER_AGENT', {
       ip: req.ip,
@@ -233,7 +234,7 @@ const userAgentCheck = (req, res, next) => {
   ];
 
   const isSuspicious = suspiciousPatterns.some(pattern => pattern.test(userAgent));
-  
+
   if (isSuspicious) {
     logSecurityEvent('SUSPICIOUS_USER_AGENT', {
       ip: req.ip,
@@ -249,7 +250,7 @@ const userAgentCheck = (req, res, next) => {
 const contentTypeCheck = (req, res, next) => {
   if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
     const contentType = req.get('Content-Type');
-    
+
     if (!contentType || !contentType.includes('application/json')) {
       return res.status(400).json({
         success: false,
@@ -258,7 +259,7 @@ const contentTypeCheck = (req, res, next) => {
       });
     }
   }
-  
+
   next();
 };
 
@@ -266,7 +267,7 @@ const contentTypeCheck = (req, res, next) => {
 const requestSizeCheck = (req, res, next) => {
   const contentLength = parseInt(req.get('Content-Length') || '0');
   const maxSize = parseInt(process.env.UPLOAD_MAX_SIZE) || 10 * 1024 * 1024; // 10MB
-  
+
   if (contentLength > maxSize) {
     return res.status(413).json({
       success: false,
@@ -274,7 +275,7 @@ const requestSizeCheck = (req, res, next) => {
       code: 'REQUEST_TOO_LARGE',
     });
   }
-  
+
   next();
 };
 
@@ -284,8 +285,8 @@ const securityLogging = (req, res, next) => {
     'x-forwarded-for': req.get('x-forwarded-for'),
     'x-real-ip': req.get('x-real-ip'),
     'user-agent': req.get('User-Agent'),
-    'referer': req.get('Referer'),
-    'origin': req.get('Origin'),
+    referer: req.get('Referer'),
+    origin: req.get('Origin'),
   };
 
   // Log pentru request-uri suspecte
@@ -316,7 +317,7 @@ const securityLogging = (req, res, next) => {
 const originCheck = (req, res, next) => {
   const origin = req.get('Origin');
   const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
-  
+
   if (origin && !allowedOrigins.includes(origin)) {
     logSecurityEvent('INVALID_ORIGIN', {
       ip: req.ip,
@@ -324,7 +325,7 @@ const originCheck = (req, res, next) => {
       allowedOrigins,
     });
   }
-  
+
   next();
 };
 
@@ -332,7 +333,7 @@ module.exports = {
   generalRateLimit,
   authRateLimit,
   slowDownMiddleware,
-  bruteForce,
+  bruteForceProtection,
   ipFilter,
   xssProtection,
   mongoSanitizeMiddleware,
@@ -343,4 +344,4 @@ module.exports = {
   requestSizeCheck,
   securityLogging,
   originCheck,
-}; 
+};

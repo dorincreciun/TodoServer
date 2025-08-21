@@ -12,7 +12,7 @@ const createTodo = async (req, res) => {
       dueDate: dueDate ? new Date(dueDate) : null,
       tags: tags || [],
       isPublic: isPublic || false,
-      user: req.user._id
+      user: req.user._id,
     });
 
     await todo.save();
@@ -21,14 +21,14 @@ const createTodo = async (req, res) => {
       success: true,
       message: 'Todo creat cu succes',
       data: {
-        todo
-      }
+        todo,
+      },
     });
   } catch (error) {
     console.error('Eroare creare todo:', error);
     res.status(500).json({
       success: false,
-      message: 'Eroare la crearea todo-ului'
+      message: 'Eroare la crearea todo-ului',
     });
   }
 };
@@ -44,7 +44,7 @@ const getTodos = async (req, res) => {
       page = 1,
       limit = 10,
       sortBy = 'createdAt',
-      sortOrder = 'desc'
+      sortOrder = 'desc',
     } = req.query;
 
     const filter = { user: req.user._id };
@@ -63,33 +63,33 @@ const getTodos = async (req, res) => {
     if (dateFilter) {
       const now = new Date();
       const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      
+
       switch (dateFilter) {
         case 'today':
           filter.dueDate = {
             $gte: startOfDay,
-            $lt: new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000)
+            $lt: new Date(startOfDay.getTime() + 24 * 60 * 60 * 1000),
           };
           break;
         case 'week':
           const endOfWeek = new Date(startOfDay.getTime() + 7 * 24 * 60 * 60 * 1000);
           filter.dueDate = {
             $gte: startOfDay,
-            $lt: endOfWeek
+            $lt: endOfWeek,
           };
           break;
         case 'two_weeks':
           const endOfTwoWeeks = new Date(startOfDay.getTime() + 14 * 24 * 60 * 60 * 1000);
           filter.dueDate = {
             $gte: startOfDay,
-            $lt: endOfTwoWeeks
+            $lt: endOfTwoWeeks,
           };
           break;
         case 'month':
           const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
           filter.dueDate = {
             $gte: startOfDay,
-            $lte: endOfMonth
+            $lte: endOfMonth,
           };
           break;
         case 'overdue':
@@ -101,10 +101,7 @@ const getTodos = async (req, res) => {
 
     // Căutare în titlu și descriere
     if (search) {
-      filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
-      ];
+      filter.$or = [{ title: { $regex: search, $options: 'i' } }, { description: { $regex: search, $options: 'i' } }];
     }
 
     // Sortare
@@ -139,15 +136,15 @@ const getTodos = async (req, res) => {
           currentPage: parseInt(page),
           totalPages: Math.ceil(total / parseInt(limit)),
           totalItems: total,
-          itemsPerPage: parseInt(limit)
-        }
-      }
+          itemsPerPage: parseInt(limit),
+        },
+      },
     });
   } catch (error) {
     console.error('Eroare obținere todo-uri:', error);
     res.status(500).json({
       success: false,
-      message: 'Eroare la obținerea todo-urilor'
+      message: 'Eroare la obținerea todo-urilor',
     });
   }
 };
@@ -157,13 +154,13 @@ const getTodo = async (req, res) => {
   try {
     const todo = await Todo.findOne({
       _id: req.params.id,
-      user: req.user._id
+      user: req.user._id,
     }).populate('user', 'firstName lastName username');
 
     if (!todo) {
       return res.status(404).json({
         success: false,
-        message: 'Todo nu a fost găsit'
+        message: 'Todo nu a fost găsit',
       });
     }
 
@@ -175,14 +172,14 @@ const getTodo = async (req, res) => {
     res.json({
       success: true,
       data: {
-        todo: todoObj
-      }
+        todo: todoObj,
+      },
     });
   } catch (error) {
     console.error('Eroare obținere todo:', error);
     res.status(500).json({
       success: false,
-      message: 'Eroare la obținerea todo-ului'
+      message: 'Eroare la obținerea todo-ului',
     });
   }
 };
@@ -211,7 +208,7 @@ const updateTodo = async (req, res) => {
     const todo = await Todo.findOneAndUpdate(
       {
         _id: req.params.id,
-        user: req.user._id
+        user: req.user._id,
       },
       updateData,
       { new: true, runValidators: true }
@@ -220,7 +217,7 @@ const updateTodo = async (req, res) => {
     if (!todo) {
       return res.status(404).json({
         success: false,
-        message: 'Todo nu a fost găsit'
+        message: 'Todo nu a fost găsit',
       });
     }
 
@@ -233,14 +230,14 @@ const updateTodo = async (req, res) => {
       success: true,
       message: 'Todo actualizat cu succes',
       data: {
-        todo: todoObj
-      }
+        todo: todoObj,
+      },
     });
   } catch (error) {
     console.error('Eroare actualizare todo:', error);
     res.status(500).json({
       success: false,
-      message: 'Eroare la actualizarea todo-ului'
+      message: 'Eroare la actualizarea todo-ului',
     });
   }
 };
@@ -250,25 +247,25 @@ const deleteTodo = async (req, res) => {
   try {
     const todo = await Todo.findOneAndDelete({
       _id: req.params.id,
-      user: req.user._id
+      user: req.user._id,
     });
 
     if (!todo) {
       return res.status(404).json({
         success: false,
-        message: 'Todo nu a fost găsit'
+        message: 'Todo nu a fost găsit',
       });
     }
 
     res.json({
       success: true,
-      message: 'Todo șters cu succes'
+      message: 'Todo șters cu succes',
     });
   } catch (error) {
     console.error('Eroare ștergere todo:', error);
     res.status(500).json({
       success: false,
-      message: 'Eroare la ștergerea todo-ului'
+      message: 'Eroare la ștergerea todo-ului',
     });
   }
 };
@@ -278,13 +275,13 @@ const markAsCompleted = async (req, res) => {
   try {
     const todo = await Todo.findOne({
       _id: req.params.id,
-      user: req.user._id
+      user: req.user._id,
     });
 
     if (!todo) {
       return res.status(404).json({
         success: false,
-        message: 'Todo nu a fost găsit'
+        message: 'Todo nu a fost găsit',
       });
     }
 
@@ -294,14 +291,14 @@ const markAsCompleted = async (req, res) => {
       success: true,
       message: 'Todo marcat ca completat',
       data: {
-        todo
-      }
+        todo,
+      },
     });
   } catch (error) {
     console.error('Eroare marcare completat:', error);
     res.status(500).json({
       success: false,
-      message: 'Eroare la marcarea todo-ului ca completat'
+      message: 'Eroare la marcarea todo-ului ca completat',
     });
   }
 };
@@ -311,13 +308,13 @@ const markAsInProgress = async (req, res) => {
   try {
     const todo = await Todo.findOne({
       _id: req.params.id,
-      user: req.user._id
+      user: req.user._id,
     });
 
     if (!todo) {
       return res.status(404).json({
         success: false,
-        message: 'Todo nu a fost găsit'
+        message: 'Todo nu a fost găsit',
       });
     }
 
@@ -327,14 +324,14 @@ const markAsInProgress = async (req, res) => {
       success: true,
       message: 'Todo marcat ca în progres',
       data: {
-        todo
-      }
+        todo,
+      },
     });
   } catch (error) {
     console.error('Eroare marcare în progres:', error);
     res.status(500).json({
       success: false,
-      message: 'Eroare la marcarea todo-ului ca în progres'
+      message: 'Eroare la marcarea todo-ului ca în progres',
     });
   }
 };
@@ -344,13 +341,13 @@ const cancelTodo = async (req, res) => {
   try {
     const todo = await Todo.findOne({
       _id: req.params.id,
-      user: req.user._id
+      user: req.user._id,
     });
 
     if (!todo) {
       return res.status(404).json({
         success: false,
-        message: 'Todo nu a fost găsit'
+        message: 'Todo nu a fost găsit',
       });
     }
 
@@ -360,14 +357,14 @@ const cancelTodo = async (req, res) => {
       success: true,
       message: 'Todo anulat',
       data: {
-        todo
-      }
+        todo,
+      },
     });
   } catch (error) {
     console.error('Eroare anulare todo:', error);
     res.status(500).json({
       success: false,
-      message: 'Eroare la anularea todo-ului'
+      message: 'Eroare la anularea todo-ului',
     });
   }
 };
@@ -382,16 +379,16 @@ const getStats = async (req, res) => {
           _id: null,
           total: { $sum: 1 },
           completed: {
-            $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ['$status', 'completed'] }, 1, 0] },
           },
           pending: {
-            $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ['$status', 'pending'] }, 1, 0] },
           },
           inProgress: {
-            $sum: { $cond: [{ $eq: ['$status', 'in_progress'] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ['$status', 'in_progress'] }, 1, 0] },
           },
           cancelled: {
-            $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] }
+            $sum: { $cond: [{ $eq: ['$status', 'cancelled'] }, 1, 0] },
           },
           overdue: {
             $sum: {
@@ -400,16 +397,16 @@ const getStats = async (req, res) => {
                   $and: [
                     { $ne: ['$status', 'completed'] },
                     { $ne: ['$status', 'cancelled'] },
-                    { $lt: ['$dueDate', new Date()] }
-                  ]
+                    { $lt: ['$dueDate', new Date()] },
+                  ],
                 },
                 1,
-                0
-              ]
-            }
-          }
-        }
-      }
+                0,
+              ],
+            },
+          },
+        },
+      },
     ]);
 
     const priorityStats = await Todo.aggregate([
@@ -417,9 +414,9 @@ const getStats = async (req, res) => {
       {
         $group: {
           _id: '$priority',
-          count: { $sum: 1 }
-        }
-      }
+          count: { $sum: 1 },
+        },
+      },
     ]);
 
     const result = {
@@ -433,20 +430,20 @@ const getStats = async (req, res) => {
       priorityBreakdown: priorityStats.reduce((acc, stat) => {
         acc[stat._id] = stat.count;
         return acc;
-      }, {})
+      }, {}),
     };
 
     res.json({
       success: true,
       data: {
-        stats: result
-      }
+        stats: result,
+      },
     });
   } catch (error) {
     console.error('Eroare obținere statistici:', error);
     res.status(500).json({
       success: false,
-      message: 'Eroare la obținerea statisticilor'
+      message: 'Eroare la obținerea statisticilor',
     });
   }
 };
@@ -460,5 +457,5 @@ module.exports = {
   markAsCompleted,
   markAsInProgress,
   cancelTodo,
-  getStats
-}; 
+  getStats,
+};

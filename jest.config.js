@@ -23,17 +23,11 @@ module.exports = {
       statements: 80,
     },
   },
-  testMatch: [
-    '**/__tests__/**/*.js',
-    '**/?(*.)+(spec|test).js',
-  ],
-  testPathIgnorePatterns: [
-    '/node_modules/',
-    '/coverage/',
-  ],
+  testMatch: ['**/__tests__/**/*.js', '**/?(*.)+(spec|test).js'],
+  testPathIgnorePatterns: ['/node_modules/', '/coverage/'],
   setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
   testTimeout: 10000,
   clearMocks: true,
   restoreMocks: true,
   resetMocks: true,
-}; 
+};

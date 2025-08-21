@@ -17,16 +17,14 @@ winston.addColors(colors);
 const logFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   winston.format.colorize({ all: true }),
-  winston.format.printf(
-    (info) => `${info.timestamp} ${info.level}: ${info.message}`,
-  ),
+  winston.format.printf(info => `${info.timestamp} ${info.level}: ${info.message}`)
 );
 
 // Format pentru fișiere (fără culori)
 const fileLogFormat = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   winston.format.errors({ stack: true }),
-  winston.format.json(),
+  winston.format.json()
 );
 
 // Configurare transport pentru fișiere
@@ -54,27 +52,23 @@ const errorFileTransport = new DailyRotateFile({
 const logger = winston.createLogger({
   level: process.env.LOG_LEVEL || 'info',
   format: fileLogFormat,
-  transports: [
-    fileTransport,
-    errorFileTransport,
-  ],
+  transports: [fileTransport, errorFileTransport],
   exitOnError: false,
 });
 
 // Adăugare transport pentru console în development
 if (process.env.NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: logFormat,
-  }));
+  logger.add(
+    new winston.transports.Console({
+      format: logFormat,
+    })
+  );
 }
 
 // Middleware pentru logging HTTP requests
 const httpLogger = winston.createLogger({
   level: 'http',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json(),
-  ),
+  format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
   transports: [
     new DailyRotateFile({
       filename: path.join(process.env.LOG_FILE_PATH || 'logs', 'http-%DATE%.log'),
@@ -89,10 +83,7 @@ const httpLogger = winston.createLogger({
 // Funcție pentru logging de securitate
 const securityLogger = winston.createLogger({
   level: 'warn',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json(),
-  ),
+  format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
   transports: [
     new DailyRotateFile({
       filename: path.join(process.env.LOG_FILE_PATH || 'logs', 'security-%DATE%.log'),
@@ -107,10 +98,7 @@ const securityLogger = winston.createLogger({
 // Funcție pentru logging de performanță
 const performanceLogger = winston.createLogger({
   level: 'info',
-  format: winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.json(),
-  ),
+  format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
   transports: [
     new DailyRotateFile({
       filename: path.join(process.env.LOG_FILE_PATH || 'logs', 'performance-%DATE%.log'),
@@ -125,7 +113,7 @@ const performanceLogger = winston.createLogger({
 // Funcții helper pentru logging
 const logRequest = (req, res, next) => {
   const start = Date.now();
-  
+
   res.on('finish', () => {
     const duration = Date.now() - start;
     const logData = {
@@ -201,4 +189,4 @@ module.exports = {
   logError,
   logInfo,
   logDebug,
-}; 
+};

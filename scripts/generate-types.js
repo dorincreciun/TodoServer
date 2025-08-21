@@ -23,11 +23,11 @@ try {
   // Generează tipurile din serverul local
   execSync('npx openapi-typescript http://localhost:3000/api-docs.json -o types/api-types.ts', {
     stdio: 'inherit',
-    cwd: path.join(__dirname, '..')
+    cwd: path.join(__dirname, '..'),
   });
-  
+
   console.log('✅ Tipurile TypeScript au fost generate cu succes în types/api-types.ts');
-  
+
   // Creează un fișier index.ts pentru export
   const indexContent = `// Tipuri generate automat din documentația OpenAPI
 export * from './api-types';
@@ -128,9 +128,8 @@ export interface TodoQueryParams {
 
   fs.writeFileSync(path.join(typesDir, 'index.ts'), indexContent);
   console.log('✅ Fișierul index.ts a fost creat cu succes');
-  
 } catch (error) {
   console.error('❌ Eroare la generarea tipurilor:', error.message);
   console.log('💡 Asigură-te că serverul rulează pe http://localhost:3000');
   process.exit(1);
-} 
+}

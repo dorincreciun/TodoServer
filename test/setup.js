@@ -1,64 +1,46 @@
 // Setup pentru testele Jest
 require('dotenv').config({ path: '.env.test' });
 
-// Mock pentru console.log în testele
-global.console = {
-  ...console,
-  log: jest.fn(),
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-};
+// Mock console.log pentru a reduce zgomotul în teste
+const originalConsoleLog = console.log;
+console.log = jest.fn();
 
-// Mock pentru timers
-jest.useFakeTimers();
-
-// Mock pentru process.env
-process.env.NODE_ENV = 'test';
-process.env.MONGODB_URI = process.env.TEST_DATABASE_URI || 'mongodb://localhost:27017/todo-list-test';
-process.env.REDIS_URL = process.env.TEST_REDIS_URL || 'redis://localhost:6379/1';
-process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing-purposes-only';
-process.env.JWT_REFRESH_SECRET = 'test-jwt-refresh-secret-key-for-testing-purposes-only';
-
-// Mock pentru Winston logger
+// Mock logger pentru a evita scrierea în fișiere în timpul testelor
 jest.mock('../config/logger', () => ({
-  logger: {
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-    debug: jest.fn(),
-  },
-  logRequest: jest.fn((req, res, next) => next()),
-  logSecurityEvent: jest.fn(),
-  logError: jest.fn(),
   logInfo: jest.fn(),
+  logError: jest.fn(),
+  logWarn: jest.fn(),
   logDebug: jest.fn(),
+  logSecurityEvent: jest.fn(),
 }));
 
-// Mock pentru Redis
+// Mock Redis client pentru teste
 jest.mock('../config/redis', () => ({
-  connect: jest.fn(),
-  disconnect: jest.fn(),
+  client: {
+    get: jest.fn(),
+    set: jest.fn(),
+    del: jest.fn(),
+    ping: jest.fn().mockResolvedValue('PONG'),
+    connect: jest.fn().mockResolvedValue(true),
+    disconnect: jest.fn().mockResolvedValue(true),
+  },
   get: jest.fn(),
   set: jest.fn(),
   del: jest.fn(),
-  exists: jest.fn(),
-  ping: jest.fn(() => Promise.resolve(true)),
-  isTokenBlacklisted: jest.fn(() => Promise.resolve(false)),
-  blacklistToken: jest.fn(() => Promise.resolve(true)),
+  connect: jest.fn().mockResolvedValue(true),
+  disconnect: jest.fn().mockResolvedValue(true),
 }));
 
-// Global test timeout
+// Set timeout global pentru teste
 jest.setTimeout(10000);
 
 // Cleanup după fiecare test
 afterEach(() => {
   jest.clearAllMocks();
-  jest.clearAllTimers();
+  console.log = originalConsoleLog;
 });
 
-// Cleanup după toate testele
+// Cleanup global
 afterAll(() => {
   jest.restoreAllMocks();
-}); 
+});

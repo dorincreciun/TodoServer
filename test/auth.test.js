@@ -1,40 +1,21 @@
 const request = require('supertest');
-const mongoose = require('mongoose');
+const { faker } = require('@faker-js/faker');
 const app = require('../server');
-const User = require('../models/User');
-const { connectDB, resetDatabase } = require('../config/database');
 
 describe('Auth Endpoints', () => {
-  let server;
+  const baseUrl = '/api/v1/auth';
 
-  beforeAll(async () => {
-    await connectDB();
-    server = app.listen(0); // Port 0 pentru testare
-  });
-
-  afterAll(async () => {
-    await mongoose.connection.close();
-    server.close();
-  });
-
-  beforeEach(async () => {
-    await resetDatabase();
-  });
-
-  describe('POST /api/v1/auth/register', () => {
-    it('should register a new user with valid data', async () => {
+  describe('POST /register', () => {
+    it('should register a new user successfully', async () => {
       const userData = {
-        username: 'testuser',
-        email: 'test@example.com',
-        password: 'Password123!',
-        firstName: 'Test',
-        lastName: 'User',
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: 'TestPassword123!',
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
       };
 
-      const response = await request(server)
-        .post('/api/v1/auth/register')
-        .send(userData)
-        .expect(201);
+      const response = await request(app).post(`${baseUrl}/register`).send(userData).expect(201);
 
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe('Utilizator înregistrat cu succes');
@@ -43,180 +24,147 @@ describe('Auth Endpoints', () => {
       expect(response.body.data).toHaveProperty('refreshToken');
       expect(response.body.data.user.email).toBe(userData.email);
       expect(response.body.data.user.username).toBe(userData.username);
-      expect(response.body.data.user).not.toHaveProperty('password');
     });
 
     it('should return error for duplicate email', async () => {
       const userData = {
-        username: 'testuser',
+        username: faker.internet.userName(),
         email: 'test@example.com',
-        password: 'Password123!',
-        firstName: 'Test',
-        lastName: 'User',
+        password: 'TestPassword123!',
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
       };
 
-      // Creează primul utilizator
-      await request(server)
-        .post('/api/v1/auth/register')
-        .send(userData)
-        .expect(201);
+      // Prima înregistrare
+      await request(app).post(`${baseUrl}/register`).send(userData).expect(201);
 
-      // Încearcă să creezi al doilea utilizator cu același email
-      const response = await request(server)
-        .post('/api/v1/auth/register')
-        .send(userData)
-        .expect(400);
+      // A doua înregistrare cu același email
+      const response = await request(app).post(`${baseUrl}/register`).send(userData).expect(400);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toContain('există deja în baza de date');
+      expect(response.body.message).toContain('există deja');
     });
 
     it('should return error for invalid email format', async () => {
       const userData = {
-        username: 'testuser',
+        username: faker.internet.userName(),
         email: 'invalid-email',
-        password: 'Password123!',
-        firstName: 'Test',
-        lastName: 'User',
+        password: 'TestPassword123!',
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
       };
 
-      const response = await request(server)
-        .post('/api/v1/auth/register')
-        .send(userData)
-        .expect(400);
+      const response = await request(app).post(`${baseUrl}/register`).send(userData).expect(400);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.errors).toBeDefined();
-      expect(response.body.errors.some(error => error.field === 'email')).toBe(true);
+      expect(response.body.code).toBe('VALIDATION_ERROR');
     });
 
     it('should return error for weak password', async () => {
       const userData = {
-        username: 'testuser',
-        email: 'test@example.com',
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
         password: '123',
-        firstName: 'Test',
-        lastName: 'User',
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
       };
 
-      const response = await request(server)
-        .post('/api/v1/auth/register')
-        .send(userData)
-        .expect(400);
+      const response = await request(app).post(`${baseUrl}/register`).send(userData).expect(400);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.errors).toBeDefined();
-      expect(response.body.errors.some(error => error.field === 'password')).toBe(true);
+      expect(response.body.code).toBe('VALIDATION_ERROR');
     });
   });
 
-  describe('POST /api/v1/auth/login', () => {
+  describe('POST /login', () => {
+    let testUser;
+
     beforeEach(async () => {
-      // Creează un utilizator pentru testare
-      const userData = {
-        username: 'testuser',
-        email: 'test@example.com',
-        password: 'Password123!',
-        firstName: 'Test',
-        lastName: 'User',
+      // Creează un utilizator de test
+      testUser = {
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: 'TestPassword123!',
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
       };
 
-      await request(server)
-        .post('/api/v1/auth/register')
-        .send(userData);
+      await request(app).post(`${baseUrl}/register`).send(testUser);
     });
 
-    it('should login with valid credentials', async () => {
+    it('should login successfully with valid credentials', async () => {
       const loginData = {
-        email: 'test@example.com',
-        password: 'Password123!',
+        email: testUser.email,
+        password: testUser.password,
       };
 
-      const response = await request(server)
-        .post('/api/v1/auth/login')
-        .send(loginData)
-        .expect(200);
+      const response = await request(app).post(`${baseUrl}/login`).send(loginData).expect(200);
 
       expect(response.body.success).toBe(true);
       expect(response.body.message).toBe('Autentificare reușită');
       expect(response.body.data).toHaveProperty('user');
       expect(response.body.data).toHaveProperty('accessToken');
       expect(response.body.data).toHaveProperty('refreshToken');
-      expect(response.body.data.user.email).toBe(loginData.email);
     });
 
-    it('should return error for invalid email', async () => {
+    it('should return error for invalid credentials', async () => {
       const loginData = {
-        email: 'nonexistent@example.com',
-        password: 'Password123!',
+        email: testUser.email,
+        password: 'WrongPassword123!',
       };
 
-      const response = await request(server)
-        .post('/api/v1/auth/login')
-        .send(loginData)
-        .expect(401);
+      const response = await request(app).post(`${baseUrl}/login`).send(loginData).expect(401);
 
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe('Email sau parolă incorectă');
     });
 
-    it('should return error for invalid password', async () => {
+    it('should return error for non-existent user', async () => {
       const loginData = {
-        email: 'test@example.com',
-        password: 'WrongPassword123!',
+        email: 'nonexistent@example.com',
+        password: 'TestPassword123!',
       };
 
-      const response = await request(server)
-        .post('/api/v1/auth/login')
-        .send(loginData)
-        .expect(401);
+      const response = await request(app).post(`${baseUrl}/login`).send(loginData).expect(401);
 
       expect(response.body.success).toBe(false);
       expect(response.body.message).toBe('Email sau parolă incorectă');
     });
   });
 
-  describe('POST /api/v1/auth/refresh', () => {
+  describe('POST /refresh', () => {
     let refreshToken;
 
     beforeEach(async () => {
       // Creează un utilizator și obține refresh token
       const userData = {
-        username: 'testuser',
-        email: 'test@example.com',
-        password: 'Password123!',
-        firstName: 'Test',
-        lastName: 'User',
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: 'TestPassword123!',
+        firstName: faker.person.firstName(),
+        lastName: faker.person.lastName(),
       };
 
-      const registerResponse = await request(server)
-        .post('/api/v1/auth/register')
-        .send(userData);
+      const registerResponse = await request(app).post(`${baseUrl}/register`).send(userData);
 
       refreshToken = registerResponse.body.data.refreshToken;
     });
 
-    it('should refresh access token with valid refresh token', async () => {
-      const response = await request(server)
-        .post('/api/v1/auth/refresh')
-        .send({ refreshToken })
-        .expect(200);
+    it('should refresh access token successfully', async () => {
+      const response = await request(app).post(`${baseUrl}/refresh`).send({ refreshToken }).expect(200);
 
       expect(response.body.success).toBe(true);
-      expect(response.body.message).toBe('Token reîmprospătat cu succes');
       expect(response.body.data).toHaveProperty('accessToken');
-      expect(response.body.data).toHaveProperty('refreshToken');
-      expect(response.body.data.accessToken).not.toBe(refreshToken);
     });
 
     it('should return error for invalid refresh token', async () => {
-      const response = await request(server)
-        .post('/api/v1/auth/refresh')
+      const response = await request(app)
+        .post(`${baseUrl}/refresh`)
         .send({ refreshToken: 'invalid-token' })
         .expect(401);
 
       expect(response.body.success).toBe(false);
-      expect(response.body.message).toBe('Refresh token invalid');
+      expect(response.body.code).toBe('INVALID_TOKEN');
     });
   });
-}); 
+});

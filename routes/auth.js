@@ -9,7 +9,7 @@ const {
   getProfile,
   updateProfile,
   changePassword,
-  refreshToken
+  refreshToken,
 } = require('../controllers/authController');
 
 const router = express.Router();
@@ -21,10 +21,7 @@ const registerValidation = [
     .withMessage('Username-ul trebuie să aibă între 3 și 30 de caractere')
     .matches(/^[a-zA-Z0-9_]+$/)
     .withMessage('Username-ul poate conține doar litere, cifre și underscore'),
-  body('email')
-    .isEmail()
-    .withMessage('Vă rugăm introduceți un email valid')
-    .normalizeEmail(),
+  body('email').isEmail().withMessage('Vă rugăm introduceți un email valid').normalizeEmail(),
   body('password')
     .isLength({ min: 6 })
     .withMessage('Parola trebuie să aibă cel puțin 6 caractere')
@@ -37,18 +34,13 @@ const registerValidation = [
   body('lastName')
     .isLength({ min: 2, max: 50 })
     .withMessage('Numele trebuie să aibă între 2 și 50 de caractere')
-    .trim()
+    .trim(),
 ];
 
 // Validare pentru login
 const loginValidation = [
-  body('email')
-    .isEmail()
-    .withMessage('Vă rugăm introduceți un email valid')
-    .normalizeEmail(),
-  body('password')
-    .notEmpty()
-    .withMessage('Parola este obligatorie')
+  body('email').isEmail().withMessage('Vă rugăm introduceți un email valid').normalizeEmail(),
+  body('password').notEmpty().withMessage('Parola este obligatorie'),
 ];
 
 // Validare pentru actualizare profil
@@ -63,23 +55,17 @@ const updateProfileValidation = [
     .isLength({ min: 2, max: 50 })
     .withMessage('Numele trebuie să aibă între 2 și 50 de caractere')
     .trim(),
-  body('email')
-    .optional()
-    .isEmail()
-    .withMessage('Vă rugăm introduceți un email valid')
-    .normalizeEmail()
+  body('email').optional().isEmail().withMessage('Vă rugăm introduceți un email valid').normalizeEmail(),
 ];
 
 // Validare pentru schimbare parolă
 const changePasswordValidation = [
-  body('currentPassword')
-    .notEmpty()
-    .withMessage('Parola curentă este obligatorie'),
+  body('currentPassword').notEmpty().withMessage('Parola curentă este obligatorie'),
   body('newPassword')
     .isLength({ min: 6 })
     .withMessage('Parola nouă trebuie să aibă cel puțin 6 caractere')
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-    .withMessage('Parola nouă trebuie să conțină cel puțin o literă mică, o literă mare și o cifră')
+    .withMessage('Parola nouă trebuie să conțină cel puțin o literă mică, o literă mare și o cifră'),
 ];
 
 /**
@@ -491,4 +477,4 @@ router.put('/profile', auth, updateProfileValidation, validate, updateProfile);
  */
 router.put('/change-password', auth, changePasswordValidation, validate, changePassword);
 
-module.exports = router; 
+module.exports = router;

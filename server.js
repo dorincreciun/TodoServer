@@ -17,8 +17,7 @@ const {
   generalRateLimit,
   authRateLimit,
   slowDownMiddleware,
-  bruteForce,
-  ipFilter,
+  bruteForceProtection,
   xssProtection,
   mongoSanitizeMiddleware,
   hppProtection,
@@ -57,65 +56,73 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
   : ['http://localhost:5173', 'http://localhost:3000'];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Permite request-uri fără origin (mobile apps, Postman, etc.)
-    if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Nu este permis de CORS'));
-    }
-  },
-  credentials: true,
-  methods: process.env.ALLOWED_METHODS?.split(',') || ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: process.env.ALLOWED_HEADERS?.split(',') || ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['X-Total-Count', 'X-Page-Count'],
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Permite request-uri fără origin (mobile apps, Postman, etc.)
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Nu este permis de CORS'));
+      }
+    },
+    credentials: true,
+    methods: process.env.ALLOWED_METHODS?.split(',') || ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: process.env.ALLOWED_HEADERS?.split(',') || ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['X-Total-Count', 'X-Page-Count'],
+  })
+);
 
 // Compresie pentru răspunsuri
-app.use(compression({
-  level: 6,
-  threshold: 1024,
-  filter: (req, res) => {
-    if (req.headers['x-no-compression']) {
-      return false;
-    }
-    return compression.filter(req, res);
-  },
-}));
+app.use(
+  compression({
+    level: 6,
+    threshold: 1024,
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) {
+        return false;
+      }
+      return compression.filter(req, res);
+    },
+  })
+);
 
 // Rate limiting
 app.use('/api/', generalRateLimit);
 app.use('/api/auth', authRateLimit);
-app.use('/api/auth/login', bruteForce.prevent);
-app.use('/api/auth/register', bruteForce.prevent);
+app.use('/api/auth/login', bruteForceProtection);
+app.use('/api/auth/register', bruteForceProtection);
 
 // Slow down pentru request-uri suspecte
 app.use(slowDownMiddleware);
 
 // Middleware pentru parsarea JSON cu limite
-app.use(express.json({ 
-  limit: process.env.UPLOAD_MAX_SIZE || '10mb',
-  verify: (req, res, buf) => {
-    try {
-      JSON.parse(buf);
-    } catch (e) {
-      res.status(400).json({
-        success: false,
-        message: 'JSON invalid',
-        code: 'INVALID_JSON',
-      });
-      throw new Error('JSON invalid');
-    }
-  }
-}));
+app.use(
+  express.json({
+    limit: process.env.UPLOAD_MAX_SIZE || '10mb',
+    verify: (req, res, buf) => {
+      try {
+        JSON.parse(buf);
+      } catch (e) {
+        res.status(400).json({
+          success: false,
+          message: 'JSON invalid',
+          code: 'INVALID_JSON',
+        });
+        throw new Error('JSON invalid');
+      }
+    },
+  })
+);
 
-app.use(express.urlencoded({ 
-  extended: true, 
-  limit: process.env.UPLOAD_MAX_SIZE || '10mb' 
-}));
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: process.env.UPLOAD_MAX_SIZE || '10mb',
+  })
+);
 
 // Middleware pentru logging HTTP requests
 app.use(logRequest);
@@ -128,17 +135,21 @@ app.use(`${apiPrefix}/${apiVersion}/auth`, authRoutes);
 app.use(`${apiPrefix}/${apiVersion}/todos`, todoRoutes);
 
 // Documentație Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs, {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Todo List API Documentation',
-  customfavIcon: '/favicon.ico',
-  swaggerOptions: {
-    persistAuthorization: true,
-    displayRequestDuration: true,
-    filter: true,
-    deepLinking: true,
-  },
-}));
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpecs, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'Todo List API Documentation',
+    customfavIcon: '/favicon.ico',
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+      filter: true,
+      deepLinking: true,
+    },
+  })
+);
 
 // Endpoint pentru specificația OpenAPI în format JSON
 app.get('/api-docs.json', (req, res) => {
@@ -223,18 +234,18 @@ app.get('/api-docs.json', (req, res) => {
 app.get('/api/health', async (req, res) => {
   try {
     const startTime = Date.now();
-    
+
     // Verifică starea bazei de date
     const dbStatus = getConnectionStatus();
-    
+
     // Verifică starea Redis
     const redisPing = await redisClient.ping();
     const redisStatus = redisPing ? 'connected' : 'disconnected';
-    
+
     // Informații despre memorie
     const memUsage = process.memoryUsage();
-    const memPercentage = (memUsage.heapUsed / memUsage.heapTotal * 100).toFixed(2);
-    
+    const memPercentage = ((memUsage.heapUsed / memUsage.heapTotal) * 100).toFixed(2);
+
     const healthData = {
       success: true,
       message: 'Serverul funcționează corect',
@@ -491,7 +502,7 @@ const startServer = async () => {
         port: PORT,
         environment: process.env.NODE_ENV || 'development',
       });
-      
+
       console.log(`🚀 Serverul rulează pe portul ${PORT}`);
       console.log(`📚 Documentația API: http://localhost:${PORT}/api-docs`);
       console.log(`🔗 API Base URL: http://localhost:${PORT}${apiPrefix}/${apiVersion}`);
@@ -501,19 +512,19 @@ const startServer = async () => {
     });
 
     // Gestionare închidere grațioasă
-    const gracefulShutdown = async (signal) => {
+    const gracefulShutdown = async signal => {
       logInfo(`Primit semnal ${signal}, închidere grațioasă...`, { context: 'Server Shutdown' });
-      
+
       server.close(async () => {
         try {
           // Închide conexiunile la baza de date
           await require('mongoose').connection.close();
           logInfo('Conexiunea MongoDB închisă', { context: 'Server Shutdown' });
-          
+
           // Închide conexiunea Redis
           await redisClient.disconnect();
           logInfo('Conexiunea Redis închisă', { context: 'Server Shutdown' });
-          
+
           logInfo('Server închis cu succes', { context: 'Server Shutdown' });
           process.exit(0);
         } catch (error) {
@@ -533,7 +544,7 @@ const startServer = async () => {
     process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
     // Gestionare erori neprinse
-    process.on('uncaughtException', (error) => {
+    process.on('uncaughtException', error => {
       logError(error, { context: 'Uncaught Exception' });
       gracefulShutdown('uncaughtException');
     });
@@ -544,7 +555,6 @@ const startServer = async () => {
       });
       gracefulShutdown('unhandledRejection');
     });
-
   } catch (error) {
     logError(error, { context: 'Server Startup' });
     process.exit(1);
@@ -554,4 +564,4 @@ const startServer = async () => {
 // Pornește serverul
 startServer();
 
-module.exports = app; 
+module.exports = app;

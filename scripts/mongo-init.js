@@ -13,9 +13,9 @@ db.createUser({
   roles: [
     {
       role: 'readWrite',
-      db: 'todo-list'
-    }
-  ]
+      db: 'todo-list',
+    },
+  ],
 });
 
 // Schimbă la baza de date todo-list
@@ -31,29 +31,29 @@ db.createCollection('users', {
         username: {
           bsonType: 'string',
           minLength: 3,
-          maxLength: 30
+          maxLength: 30,
         },
         email: {
           bsonType: 'string',
-          pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'
+          pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$',
         },
         password: {
           bsonType: 'string',
-          minLength: 6
+          minLength: 6,
         },
         firstName: {
           bsonType: 'string',
           minLength: 2,
-          maxLength: 50
+          maxLength: 50,
         },
         lastName: {
           bsonType: 'string',
           minLength: 2,
-          maxLength: 50
-        }
-      }
-    }
-  }
+          maxLength: 50,
+        },
+      },
+    },
+  },
 });
 
 db.createCollection('todos', {
@@ -65,36 +65,36 @@ db.createCollection('todos', {
         title: {
           bsonType: 'string',
           minLength: 1,
-          maxLength: 200
+          maxLength: 200,
         },
         description: {
           bsonType: 'string',
-          maxLength: 1000
+          maxLength: 1000,
         },
         status: {
-          enum: ['pending', 'in_progress', 'completed', 'cancelled']
+          enum: ['pending', 'in_progress', 'completed', 'cancelled'],
         },
         priority: {
-          enum: ['low', 'medium', 'high', 'urgent']
+          enum: ['low', 'medium', 'high', 'urgent'],
         },
         user: {
-          bsonType: 'objectId'
-        }
-      }
-    }
-  }
+          bsonType: 'objectId',
+        },
+      },
+    },
+  },
 });
 
 // Creează indexuri pentru performanță
-db.users.createIndex({ 'email': 1 }, { unique: true });
-db.users.createIndex({ 'username': 1 }, { unique: true });
-db.users.createIndex({ 'createdAt': -1 });
+db.users.createIndex({ email: 1 }, { unique: true });
+db.users.createIndex({ username: 1 }, { unique: true });
+db.users.createIndex({ createdAt: -1 });
 
-db.todos.createIndex({ 'user': 1, 'status': 1 });
-db.todos.createIndex({ 'user': 1, 'dueDate': 1 });
-db.todos.createIndex({ 'user': 1, 'priority': 1 });
-db.todos.createIndex({ 'user': 1, 'createdAt': -1 });
-db.todos.createIndex({ 'tags': 1 });
+db.todos.createIndex({ user: 1, status: 1 });
+db.todos.createIndex({ user: 1, dueDate: 1 });
+db.todos.createIndex({ user: 1, priority: 1 });
+db.todos.createIndex({ user: 1, createdAt: -1 });
+db.todos.createIndex({ tags: 1 });
 
 // Creează utilizator de test (opțional)
 db.users.insertOne({
@@ -105,7 +105,7 @@ db.users.insertOne({
   lastName: 'User',
   isActive: true,
   createdAt: new Date(),
-  updatedAt: new Date()
+  updatedAt: new Date(),
 });
 
 // Creează câteva todo-uri de test
@@ -119,7 +119,7 @@ db.todos.insertMany([
     tags: ['configurare', 'proiect'],
     isPublic: false,
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   },
   {
     title: 'Implementare autentificare',
@@ -130,7 +130,7 @@ db.todos.insertMany([
     tags: ['autentificare', 'jwt', 'securitate'],
     isPublic: false,
     createdAt: new Date(),
-    updatedAt: new Date()
+    updatedAt: new Date(),
   },
   {
     title: 'Testare API',
@@ -141,11 +141,11 @@ db.todos.insertMany([
     tags: ['testare', 'api'],
     isPublic: false,
     createdAt: new Date(),
-    updatedAt: new Date()
-  }
+    updatedAt: new Date(),
+  },
 ]);
 
 print('MongoDB inițializat cu succes!');
 print('Utilizator admin creat: admin@example.com / password123');
 print('Colecții create: users, todos');
-print('Indexuri create pentru performanță optimă'); 
+print('Indexuri create pentru performanță optimă');

@@ -11,14 +11,14 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
       MONGO_INITDB_DATABASE: todo-list
     ports:
-      - "27017:27017"
+      - '27017:27017'
     volumes:
       - mongodb_data:/data/db
       - ./scripts/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     networks:
       - todo-network
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -36,13 +36,13 @@ services:
     container_name: todo-redis-prod
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
     networks:
       - todo-network
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -63,7 +63,7 @@ services:
     container_name: todo-backend-prod
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - NODE_ENV=production
       - PORT=3000
@@ -85,7 +85,13 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "require('http').get('http://localhost:3000/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -115,8 +121,8 @@ services:
     container_name: todo-nginx-prod
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
@@ -126,7 +132,7 @@ services:
     depends_on:
       - backend
     healthcheck:
-      test: ["CMD", "nginx", "-t"]
+      test: ['CMD', 'nginx', '-t']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -143,7 +149,7 @@ services:
     container_name: todo-prometheus
     restart: unless-stopped
     ports:
-      - "9090:9090"
+      - '9090:9090'
     volumes:
       - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
@@ -169,7 +175,7 @@ services:
     container_name: todo-grafana
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - '3001:3000'
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
     volumes:
@@ -204,4 +210,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/16 
+        - subnet: 172.20.0.0/16

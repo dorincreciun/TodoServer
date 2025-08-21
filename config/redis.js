@@ -13,7 +13,7 @@ class RedisClient {
         url: process.env.REDIS_URL || 'redis://localhost:6379',
         password: process.env.REDIS_PASSWORD || undefined,
         database: parseInt(process.env.REDIS_DB) || 0,
-        retry_strategy: (options) => {
+        retry_strategy: options => {
           if (options.error && options.error.code === 'ECONNREFUSED') {
             logError(new Error('Redis server refused connection'), { context: 'Redis Connect' });
             return new Error('Redis server refused connection');
@@ -39,7 +39,7 @@ class RedisClient {
         logInfo('Redis client ready', { context: 'Redis' });
       });
 
-      this.client.on('error', (err) => {
+      this.client.on('error', err => {
         this.isConnected = false;
         logError(err, { context: 'Redis Error' });
       });
@@ -249,4 +249,4 @@ class RedisClient {
 // Singleton instance
 const redisClient = new RedisClient();
 
-module.exports = redisClient; 
+module.exports = redisClient;

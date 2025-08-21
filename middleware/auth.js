@@ -14,7 +14,7 @@ const JWT_CONFIG = {
 };
 
 // Funcție pentru generarea token-urilor
-const generateTokens = (user) => {
+const generateTokens = user => {
   const payload = {
     userId: user._id,
     email: user.email,
@@ -28,13 +28,9 @@ const generateTokens = (user) => {
     expiresIn: JWT_CONFIG.expiresIn,
   });
 
-  const refreshToken = jwt.sign(
-    { ...payload, type: 'refresh' },
-    JWT_CONFIG.refreshSecret,
-    {
-      expiresIn: JWT_CONFIG.refreshExpiresIn,
-    }
-  );
+  const refreshToken = jwt.sign({ ...payload, type: 'refresh' }, JWT_CONFIG.refreshSecret, {
+    expiresIn: JWT_CONFIG.refreshExpiresIn,
+  });
 
   return { accessToken, refreshToken };
 };
@@ -52,7 +48,7 @@ const verifyToken = (token, secret = JWT_CONFIG.secret) => {
 };
 
 // Funcție pentru decodarea token-ului fără verificare
-const decodeToken = (token) => {
+const decodeToken = token => {
   try {
     return jwt.decode(token);
   } catch (error) {
@@ -78,7 +74,7 @@ const authenticateToken = async (req, res, next) => {
     const isBlacklisted = await redisClient.isTokenBlacklisted(token);
     if (isBlacklisted) {
       logSecurityEvent('BLACKLISTED_TOKEN_ACCESS', {
-        token: token.substring(0, 20) + '...',
+        token: `${token.substring(0, 20)}...`,
         ip: req.ip,
         userAgent: req.get('User-Agent'),
       });
@@ -129,7 +125,7 @@ const authenticateToken = async (req, res, next) => {
 
     if (error.name === 'JsonWebTokenError') {
       logSecurityEvent('INVALID_TOKEN_ACCESS', {
-        token: req.headers.authorization?.substring(0, 20) + '...',
+        token: `${req.headers.authorization?.substring(0, 20)}...`,
         ip: req.ip,
         userAgent: req.get('User-Agent'),
         error: error.message,
@@ -168,7 +164,7 @@ const authenticateRefreshToken = async (req, res, next) => {
     const isBlacklisted = await redisClient.isTokenBlacklisted(refreshToken);
     if (isBlacklisted) {
       logSecurityEvent('BLACKLISTED_REFRESH_TOKEN', {
-        token: refreshToken.substring(0, 20) + '...',
+        token: `${refreshToken.substring(0, 20)}...`,
         ip: req.ip,
       });
 
@@ -233,30 +229,28 @@ const authenticateRefreshToken = async (req, res, next) => {
 };
 
 // Middleware pentru verificarea rolului (pentru viitoare extensii)
-const requireRole = (roles) => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: 'Autentificare necesară',
-        code: 'AUTHENTICATION_REQUIRED',
-      });
-    }
+const requireRole = roles => (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: 'Autentificare necesară',
+      code: 'AUTHENTICATION_REQUIRED',
+    });
+  }
 
-    // Pentru moment, toți utilizatorii au același rol
-    // În viitor, poți adăuga un câmp role la modelul User
-    const userRole = req.user.role || 'user';
+  // Pentru moment, toți utilizatorii au același rol
+  // În viitor, poți adăuga un câmp role la modelul User
+  const userRole = req.user.role || 'user';
 
-    if (!roles.includes(userRole)) {
-      return res.status(403).json({
-        success: false,
-        message: 'Permisiuni insuficiente',
-        code: 'INSUFFICIENT_PERMISSIONS',
-      });
-    }
+  if (!roles.includes(userRole)) {
+    return res.status(403).json({
+      success: false,
+      message: 'Permisiuni insuficiente',
+      code: 'INSUFFICIENT_PERMISSIONS',
+    });
+  }
 
-    next();
-  };
+  next();
 };
 
 // Funcție pentru invalidarea token-urilor (logout)
@@ -344,4 +338,4 @@ module.exports = {
   invalidateTokens,
   userRateLimit,
   JWT_CONFIG,
-}; 
+};

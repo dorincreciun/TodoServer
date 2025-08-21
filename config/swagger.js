@@ -6,25 +6,26 @@ const options = {
     info: {
       title: 'Todo List API',
       version: '1.0.0',
-      description: 'API complet pentru gestionarea unei aplicații Todo List cu autentificare JWT, gestionare utilizatori și todo-uri cu funcționalități avansate',
+      description:
+        'API complet pentru gestionarea unei aplicații Todo List cu autentificare JWT, gestionare utilizatori și todo-uri cu funcționalități avansate',
       contact: {
         name: 'API Support',
-        email: 'support@todolist.com'
+        email: 'support@todolist.com',
       },
       license: {
         name: 'MIT',
-        url: 'https://opensource.org/licenses/MIT'
-      }
+        url: 'https://opensource.org/licenses/MIT',
+      },
     },
     servers: [
       {
         url: 'http://localhost:3000/api',
-        description: 'Server de dezvoltare'
+        description: 'Server de dezvoltare',
       },
       {
         url: 'https://api.todolist.com',
-        description: 'Server de producție'
-      }
+        description: 'Server de producție',
+      },
     ],
     components: {
       securitySchemes: {
@@ -32,8 +33,8 @@ const options = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Token JWT pentru autentificare. Includeți token-ul în header-ul Authorization: Bearer <token>'
-        }
+          description: 'Token JWT pentru autentificare. Includeți token-ul în header-ul Authorization: Bearer <token>',
+        },
       },
       schemas: {
         User: {
@@ -42,54 +43,54 @@ const options = {
             _id: {
               type: 'string',
               format: 'ObjectId',
-              description: 'ID-ul unic al utilizatorului'
+              description: 'ID-ul unic al utilizatorului',
             },
             username: {
               type: 'string',
               minLength: 3,
               maxLength: 30,
               pattern: '^[a-zA-Z0-9_]+$',
-              description: 'Username-ul utilizatorului (doar litere, cifre și underscore)'
+              description: 'Username-ul utilizatorului (doar litere, cifre și underscore)',
             },
             email: {
               type: 'string',
               format: 'email',
-              description: 'Email-ul utilizatorului'
+              description: 'Email-ul utilizatorului',
             },
             firstName: {
               type: 'string',
               minLength: 2,
               maxLength: 50,
-              description: 'Prenumele utilizatorului'
+              description: 'Prenumele utilizatorului',
             },
             lastName: {
               type: 'string',
               minLength: 2,
               maxLength: 50,
-              description: 'Numele utilizatorului'
+              description: 'Numele utilizatorului',
             },
             isActive: {
               type: 'boolean',
               default: true,
-              description: 'Statusul contului (activ/inactiv)'
+              description: 'Statusul contului (activ/inactiv)',
             },
             lastLogin: {
               type: 'string',
               format: 'date-time',
-              description: 'Ultima conectare a utilizatorului'
+              description: 'Ultima conectare a utilizatorului',
             },
             createdAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Data creării contului'
+              description: 'Data creării contului',
             },
             updatedAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Data ultimei actualizări'
-            }
+              description: 'Data ultimei actualizări',
+            },
           },
-          required: ['username', 'email', 'firstName', 'lastName']
+          required: ['username', 'email', 'firstName', 'lastName'],
         },
         Todo: {
           type: 'object',
@@ -97,71 +98,71 @@ const options = {
             _id: {
               type: 'string',
               format: 'ObjectId',
-              description: 'ID-ul unic al todo-ului'
+              description: 'ID-ul unic al todo-ului',
             },
             title: {
               type: 'string',
               minLength: 1,
               maxLength: 200,
-              description: 'Titlul todo-ului'
+              description: 'Titlul todo-ului',
             },
             description: {
               type: 'string',
               maxLength: 1000,
-              description: 'Descrierea detaliată a todo-ului'
+              description: 'Descrierea detaliată a todo-ului',
             },
             status: {
               type: 'string',
               enum: ['pending', 'in_progress', 'completed', 'cancelled'],
               default: 'pending',
-              description: 'Statusul curent al todo-ului'
+              description: 'Statusul curent al todo-ului',
             },
             priority: {
               type: 'string',
               enum: ['low', 'medium', 'high', 'urgent'],
               default: 'medium',
-              description: 'Prioritatea todo-ului'
+              description: 'Prioritatea todo-ului',
             },
             dueDate: {
               type: 'string',
               format: 'date-time',
-              description: 'Data de scadență a todo-ului'
+              description: 'Data de scadență a todo-ului',
             },
             completedAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Data când todo-ul a fost completat'
+              description: 'Data când todo-ul a fost completat',
             },
             tags: {
               type: 'array',
               items: {
                 type: 'string',
-                maxLength: 20
+                maxLength: 20,
               },
-              description: 'Tag-urile asociate todo-ului pentru organizare'
+              description: 'Tag-urile asociate todo-ului pentru organizare',
             },
             user: {
               $ref: '#/components/schemas/User',
-              description: 'Utilizatorul care a creat todo-ul'
+              description: 'Utilizatorul care a creat todo-ul',
             },
             isPublic: {
               type: 'boolean',
               default: false,
-              description: 'Dacă todo-ul este vizibil public'
+              description: 'Dacă todo-ul este vizibil public',
             },
             isOverdue: {
               type: 'boolean',
-              description: 'Dacă todo-ul este întârziat (calculat automat)'
+              description: 'Dacă todo-ul este întârziat (calculat automat)',
             },
             timeUntilDue: {
               type: 'string',
-              description: 'Timpul rămas până la scadență (calculat automat)'
+              description: 'Timpul rămas până la scadență (calculat automat)',
             },
             progress: {
               type: 'number',
               minimum: 0,
               maximum: 100,
-              description: 'Progresul todo-ului în procente (0-100)'
+              description: 'Progresul todo-ului în procente (0-100)',
             },
             attachments: {
               type: 'array',
@@ -172,56 +173,56 @@ const options = {
                   originalName: { type: 'string' },
                   mimeType: { type: 'string' },
                   size: { type: 'number' },
-                  url: { type: 'string' }
-                }
+                  url: { type: 'string' },
+                },
               },
-              description: 'Fișiere atașate la todo'
+              description: 'Fișiere atașate la todo',
             },
             createdAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Data creării todo-ului'
+              description: 'Data creării todo-ului',
             },
             updatedAt: {
               type: 'string',
               format: 'date-time',
-              description: 'Data ultimei actualizări'
-            }
+              description: 'Data ultimei actualizări',
+            },
           },
-          required: ['title', 'user']
+          required: ['title', 'user'],
         },
         TodoStats: {
           type: 'object',
           properties: {
             total: {
               type: 'integer',
-              description: 'Numărul total de todo-uri'
+              description: 'Numărul total de todo-uri',
             },
             completed: {
               type: 'integer',
-              description: 'Numărul de todo-uri completate'
+              description: 'Numărul de todo-uri completate',
             },
             pending: {
               type: 'integer',
-              description: 'Numărul de todo-uri în așteptare'
+              description: 'Numărul de todo-uri în așteptare',
             },
             inProgress: {
               type: 'integer',
-              description: 'Numărul de todo-uri în progres'
+              description: 'Numărul de todo-uri în progres',
             },
             cancelled: {
               type: 'integer',
-              description: 'Numărul de todo-uri anulate'
+              description: 'Numărul de todo-uri anulate',
             },
             overdue: {
               type: 'integer',
-              description: 'Numărul de todo-uri întârziate'
+              description: 'Numărul de todo-uri întârziate',
             },
             completionRate: {
               type: 'number',
               minimum: 0,
               maximum: 100,
-              description: 'Rata de completare în procente'
+              description: 'Rata de completare în procente',
             },
             priorityBreakdown: {
               type: 'object',
@@ -229,11 +230,11 @@ const options = {
                 low: { type: 'integer' },
                 medium: { type: 'integer' },
                 high: { type: 'integer' },
-                urgent: { type: 'integer' }
+                urgent: { type: 'integer' },
               },
-              description: 'Distribuția todo-urilor pe priorități'
-            }
-          }
+              description: 'Distribuția todo-urilor pe priorități',
+            },
+          },
         },
         Pagination: {
           type: 'object',
@@ -241,36 +242,36 @@ const options = {
             currentPage: {
               type: 'integer',
               minimum: 1,
-              description: 'Pagina curentă'
+              description: 'Pagina curentă',
             },
             totalPages: {
               type: 'integer',
               minimum: 0,
-              description: 'Numărul total de pagini'
+              description: 'Numărul total de pagini',
             },
             totalItems: {
               type: 'integer',
               minimum: 0,
-              description: 'Numărul total de elemente'
+              description: 'Numărul total de elemente',
             },
             itemsPerPage: {
               type: 'integer',
               minimum: 1,
               maximum: 100,
-              description: 'Numărul de elemente per pagină'
-            }
-          }
+              description: 'Numărul de elemente per pagină',
+            },
+          },
         },
         Error: {
           type: 'object',
           properties: {
             success: {
               type: 'boolean',
-              example: false
+              example: false,
             },
             message: {
               type: 'string',
-              description: 'Mesajul de eroare principal'
+              description: 'Mesajul de eroare principal',
             },
             errors: {
               type: 'array',
@@ -279,40 +280,40 @@ const options = {
                 properties: {
                   field: {
                     type: 'string',
-                    description: 'Câmpul care a cauzat eroarea'
+                    description: 'Câmpul care a cauzat eroarea',
                   },
                   message: {
                     type: 'string',
-                    description: 'Mesajul de eroare pentru câmp'
+                    description: 'Mesajul de eroare pentru câmp',
                   },
                   value: {
                     type: 'string',
-                    description: 'Valoarea care a cauzat eroarea'
-                  }
-                }
+                    description: 'Valoarea care a cauzat eroarea',
+                  },
+                },
               },
-              description: 'Lista de erori de validare'
-            }
+              description: 'Lista de erori de validare',
+            },
           },
-          required: ['success', 'message']
+          required: ['success', 'message'],
         },
         Success: {
           type: 'object',
           properties: {
             success: {
               type: 'boolean',
-              example: true
+              example: true,
             },
             message: {
               type: 'string',
-              description: 'Mesajul de succes'
+              description: 'Mesajul de succes',
             },
             data: {
               type: 'object',
-              description: 'Datele returnate de API'
-            }
+              description: 'Datele returnate de API',
+            },
           },
-          required: ['success']
+          required: ['success'],
         },
         LoginRequest: {
           type: 'object',
@@ -320,14 +321,14 @@ const options = {
             email: {
               type: 'string',
               format: 'email',
-              description: 'Email-ul utilizatorului'
+              description: 'Email-ul utilizatorului',
             },
             password: {
               type: 'string',
-              description: 'Parola utilizatorului'
-            }
+              description: 'Parola utilizatorului',
+            },
           },
-          required: ['email', 'password']
+          required: ['email', 'password'],
         },
         RegisterRequest: {
           type: 'object',
@@ -337,33 +338,33 @@ const options = {
               minLength: 3,
               maxLength: 30,
               pattern: '^[a-zA-Z0-9_]+$',
-              description: 'Username-ul utilizatorului'
+              description: 'Username-ul utilizatorului',
             },
             email: {
               type: 'string',
               format: 'email',
-              description: 'Email-ul utilizatorului'
+              description: 'Email-ul utilizatorului',
             },
             password: {
               type: 'string',
               minLength: 6,
               pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)',
-              description: 'Parola (min 6 caractere, cel puțin o literă mică, mare și o cifră)'
+              description: 'Parola (min 6 caractere, cel puțin o literă mică, mare și o cifră)',
             },
             firstName: {
               type: 'string',
               minLength: 2,
               maxLength: 50,
-              description: 'Prenumele utilizatorului'
+              description: 'Prenumele utilizatorului',
             },
             lastName: {
               type: 'string',
               minLength: 2,
               maxLength: 50,
-              description: 'Numele utilizatorului'
-            }
+              description: 'Numele utilizatorului',
+            },
           },
-          required: ['username', 'email', 'password', 'firstName', 'lastName']
+          required: ['username', 'email', 'password', 'firstName', 'lastName'],
         },
         TodoCreateRequest: {
           type: 'object',
@@ -372,39 +373,39 @@ const options = {
               type: 'string',
               minLength: 1,
               maxLength: 200,
-              description: 'Titlul todo-ului'
+              description: 'Titlul todo-ului',
             },
             description: {
               type: 'string',
               maxLength: 1000,
-              description: 'Descrierea todo-ului'
+              description: 'Descrierea todo-ului',
             },
             priority: {
               type: 'string',
               enum: ['low', 'medium', 'high', 'urgent'],
               default: 'medium',
-              description: 'Prioritatea todo-ului'
+              description: 'Prioritatea todo-ului',
             },
             dueDate: {
               type: 'string',
               format: 'date-time',
-              description: 'Data de scadență'
+              description: 'Data de scadență',
             },
             tags: {
               type: 'array',
               items: {
                 type: 'string',
-                maxLength: 20
+                maxLength: 20,
               },
-              description: 'Tag-urile asociate todo-ului'
+              description: 'Tag-urile asociate todo-ului',
             },
             isPublic: {
               type: 'boolean',
               default: false,
-              description: 'Dacă todo-ul este public'
-            }
+              description: 'Dacă todo-ul este public',
+            },
           },
-          required: ['title']
+          required: ['title'],
         },
         TodoUpdateRequest: {
           type: 'object',
@@ -413,41 +414,41 @@ const options = {
               type: 'string',
               minLength: 1,
               maxLength: 200,
-              description: 'Titlul todo-ului'
+              description: 'Titlul todo-ului',
             },
             description: {
               type: 'string',
               maxLength: 1000,
-              description: 'Descrierea todo-ului'
+              description: 'Descrierea todo-ului',
             },
             status: {
               type: 'string',
               enum: ['pending', 'in_progress', 'completed', 'cancelled'],
-              description: 'Statusul todo-ului'
+              description: 'Statusul todo-ului',
             },
             priority: {
               type: 'string',
               enum: ['low', 'medium', 'high', 'urgent'],
-              description: 'Prioritatea todo-ului'
+              description: 'Prioritatea todo-ului',
             },
             dueDate: {
               type: 'string',
               format: 'date-time',
-              description: 'Data de scadență'
+              description: 'Data de scadență',
             },
             tags: {
               type: 'array',
               items: {
                 type: 'string',
-                maxLength: 20
+                maxLength: 20,
               },
-              description: 'Tag-urile asociate todo-ului'
+              description: 'Tag-urile asociate todo-ului',
             },
             isPublic: {
               type: 'boolean',
-              description: 'Dacă todo-ul este public'
-            }
-          }
+              description: 'Dacă todo-ul este public',
+            },
+          },
         },
         ProfileUpdateRequest: {
           type: 'object',
@@ -456,71 +457,71 @@ const options = {
               type: 'string',
               minLength: 2,
               maxLength: 50,
-              description: 'Prenumele utilizatorului'
+              description: 'Prenumele utilizatorului',
             },
             lastName: {
               type: 'string',
               minLength: 2,
               maxLength: 50,
-              description: 'Numele utilizatorului'
+              description: 'Numele utilizatorului',
             },
             email: {
               type: 'string',
               format: 'email',
-              description: 'Email-ul utilizatorului'
-            }
-          }
+              description: 'Email-ul utilizatorului',
+            },
+          },
         },
         ChangePasswordRequest: {
           type: 'object',
           properties: {
             currentPassword: {
               type: 'string',
-              description: 'Parola curentă'
+              description: 'Parola curentă',
             },
             newPassword: {
               type: 'string',
               minLength: 6,
               pattern: '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)',
-              description: 'Parola nouă (min 6 caractere, cel puțin o literă mică, mare și o cifră)'
-            }
+              description: 'Parola nouă (min 6 caractere, cel puțin o literă mică, mare și o cifră)',
+            },
           },
-          required: ['currentPassword', 'newPassword']
+          required: ['currentPassword', 'newPassword'],
         },
         RefreshTokenRequest: {
           type: 'object',
           properties: {
             refreshToken: {
               type: 'string',
-              description: 'Refresh token-ul pentru obținerea unui nou access token'
-            }
+              description: 'Refresh token-ul pentru obținerea unui nou access token',
+            },
           },
-          required: ['refreshToken']
-        }
-      }
+          required: ['refreshToken'],
+        },
+      },
     },
     tags: [
       {
         name: 'Autentificare',
-        description: 'Endpoints pentru înregistrare, autentificare și gestionarea token-urilor'
+        description: 'Endpoints pentru înregistrare, autentificare și gestionarea token-urilor',
       },
       {
         name: 'Profil',
-        description: 'Endpoints pentru gestionarea profilului utilizatorului'
+        description: 'Endpoints pentru gestionarea profilului utilizatorului',
       },
       {
         name: 'Todo-uri',
-        description: 'Endpoints pentru gestionarea todo-urilor (CRUD, filtrare, statistici)'
+        description: 'Endpoints pentru gestionarea todo-urilor (CRUD, filtrare, statistici)',
       },
       {
         name: 'Sistem',
-        description: 'Endpoints pentru informații despre sistem și health check'
-      }
-    ]
+        description: 'Endpoints pentru informații despre sistem și health check',
+      },
+    ],
   },
-  apis: ['./routes/*.js', './controllers/*.js', './server.js']
+  apis: ['./routes/*.js', './controllers/*.js', './server.js'],
 };
 
 const specs = swaggerJsdoc(options);
 
-module.exports = specs; 
+module.exports = specs;

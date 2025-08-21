@@ -56,4 +56,4 @@ scrape_configs:
       - targets: ['backend:3000']
     metrics_path: '/api/health'
     scrape_interval: 60s
-    scrape_timeout: 10s 
+    scrape_timeout: 10s

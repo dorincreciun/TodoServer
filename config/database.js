@@ -4,7 +4,7 @@ const { logError, logInfo } = require('./logger');
 const connectDB = async () => {
   try {
     const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/todo-list';
-    
+
     const options = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -36,7 +36,7 @@ const connectDB = async () => {
       logInfo('Mongoose conectat la MongoDB', { context: 'Database' });
     });
 
-    mongoose.connection.on('error', (err) => {
+    mongoose.connection.on('error', err => {
       logError(err, { context: 'Mongoose Connection Error' });
     });
 
@@ -86,7 +86,7 @@ const getConnectionStatus = () => {
     2: 'connecting',
     3: 'disconnecting',
   };
-  
+
   return {
     state: states[mongoose.connection.readyState],
     readyState: mongoose.connection.readyState,
@@ -127,4 +127,4 @@ module.exports = {
   disconnectDB,
   getConnectionStatus,
   resetDatabase,
-}; 
+};

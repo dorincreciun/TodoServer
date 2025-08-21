@@ -2,7 +2,8 @@
 
 ## Prezentare Generală
 
-API-ul Todo List oferă o soluție completă pentru gestionarea todo-urilor cu autentificare JWT, validare avansată și funcționalități de filtrare și statistici.
+API-ul Todo List oferă o soluție completă pentru gestionarea todo-urilor cu autentificare JWT,
+validare avansată și funcționalități de filtrare și statistici.
 
 ### Caracteristici Principale
 
@@ -24,7 +25,8 @@ http://localhost:3000/api
 
 ## Autentificare
 
-Toate endpoint-urile (cu excepția celor de autentificare) necesită un token JWT în header-ul `Authorization`:
+Toate endpoint-urile (cu excepția celor de autentificare) necesită un token JWT în header-ul
+`Authorization`:
 
 ```
 Authorization: Bearer <your-jwt-token>
@@ -35,9 +37,11 @@ Authorization: Bearer <your-jwt-token>
 ### 🔐 Autentificare
 
 #### POST /auth/register
+
 Înregistrează un utilizator nou.
 
 **Request Body:**
+
 ```json
 {
   "username": "john_doe",
@@ -49,6 +53,7 @@ Authorization: Bearer <your-jwt-token>
 ```
 
 **Response (201):**
+
 ```json
 {
   "success": true,
@@ -70,9 +75,11 @@ Authorization: Bearer <your-jwt-token>
 ```
 
 #### POST /auth/login
+
 Autentifică un utilizator existent.
 
 **Request Body:**
+
 ```json
 {
   "email": "john@example.com",
@@ -81,6 +88,7 @@ Autentifică un utilizator existent.
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -102,9 +110,11 @@ Autentifică un utilizator existent.
 ```
 
 #### POST /auth/refresh
+
 Reîmprospătează token-ul de acces.
 
 **Request Body:**
+
 ```json
 {
   "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
@@ -112,6 +122,7 @@ Reîmprospătează token-ul de acces.
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -123,11 +134,13 @@ Reîmprospătează token-ul de acces.
 ```
 
 #### POST /auth/logout
+
 Deconectează utilizatorul.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -138,11 +151,13 @@ Deconectează utilizatorul.
 ### 👤 Profil
 
 #### GET /auth/profile
+
 Obține profilul utilizatorului curent.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -163,11 +178,13 @@ Obține profilul utilizatorului curent.
 ```
 
 #### PUT /auth/profile
+
 Actualizează profilul utilizatorului.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Request Body:**
+
 ```json
 {
   "firstName": "John",
@@ -177,6 +194,7 @@ Actualizează profilul utilizatorului.
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -198,11 +216,13 @@ Actualizează profilul utilizatorului.
 ```
 
 #### PUT /auth/change-password
+
 Schimbă parola utilizatorului.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Request Body:**
+
 ```json
 {
   "currentPassword": "OldPassword123",
@@ -211,6 +231,7 @@ Schimbă parola utilizatorului.
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -221,11 +242,13 @@ Schimbă parola utilizatorului.
 ### ✅ Todo-uri
 
 #### POST /todos
+
 Creează un todo nou.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Request Body:**
+
 ```json
 {
   "title": "Cumpără pâine",
@@ -238,6 +261,7 @@ Creează un todo nou.
 ```
 
 **Response (201):**
+
 ```json
 {
   "success": true,
@@ -261,11 +285,13 @@ Creează un todo nou.
 ```
 
 #### GET /todos
+
 Obține toate todo-urile cu filtrare și paginare.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Query Parameters:**
+
 - `status` - Filtrare după status (pending, in_progress, completed, cancelled)
 - `priority` - Filtrare după prioritate (low, medium, high, urgent)
 - `dateFilter` - Filtrare după dată (today, week, two_weeks, month, overdue)
@@ -276,11 +302,13 @@ Obține toate todo-urile cu filtrare și paginare.
 - `sortOrder` - Ordinea de sortare (asc, desc)
 
 **Example Request:**
+
 ```
 GET /todos?status=pending&priority=high&page=1&limit=10&sortBy=dueDate&sortOrder=asc
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -319,11 +347,13 @@ GET /todos?status=pending&priority=high&page=1&limit=10&sortBy=dueDate&sortOrder
 ```
 
 #### GET /todos/stats
+
 Obține statistici pentru todo-uri.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -348,11 +378,13 @@ Obține statistici pentru todo-uri.
 ```
 
 #### GET /todos/{id}
+
 Obține un todo specific.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -383,11 +415,13 @@ Obține un todo specific.
 ```
 
 #### PUT /todos/{id}
+
 Actualizează un todo.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Request Body:**
+
 ```json
 {
   "title": "Cumpără pâine și lapte",
@@ -401,6 +435,7 @@ Actualizează un todo.
 ```
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -432,11 +467,13 @@ Actualizează un todo.
 ```
 
 #### DELETE /todos/{id}
+
 Șterge un todo.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -445,11 +482,13 @@ Actualizează un todo.
 ```
 
 #### PATCH /todos/{id}/complete
+
 Marchează todo ca completat.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -467,11 +506,13 @@ Marchează todo ca completat.
 ```
 
 #### PATCH /todos/{id}/progress
+
 Marchează todo ca în progres.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -488,11 +529,13 @@ Marchează todo ca în progres.
 ```
 
 #### PATCH /todos/{id}/cancel
+
 Anulează todo.
 
 **Headers:** `Authorization: Bearer <token>`
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -510,9 +553,11 @@ Anulează todo.
 ### 🖥️ Sistem
 
 #### GET /health
+
 Health check pentru server.
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -523,9 +568,11 @@ Health check pentru server.
 ```
 
 #### GET /
+
 Informații despre API.
 
 **Response (200):**
+
 ```json
 {
   "success": true,
@@ -542,6 +589,7 @@ Informații despre API.
 ## Coduri de Eroare
 
 ### 400 - Bad Request
+
 Date invalide sau lipsă.
 
 ```json
@@ -559,6 +607,7 @@ Date invalide sau lipsă.
 ```
 
 ### 401 - Unauthorized
+
 Token invalid sau lipsă.
 
 ```json
@@ -569,6 +618,7 @@ Token invalid sau lipsă.
 ```
 
 ### 404 - Not Found
+
 Resursa nu a fost găsită.
 
 ```json
@@ -579,6 +629,7 @@ Resursa nu a fost găsită.
 ```
 
 ### 422 - Unprocessable Entity
+
 Erori de validare.
 
 ```json
@@ -595,6 +646,7 @@ Erori de validare.
 ```
 
 ### 429 - Too Many Requests
+
 Rate limit depășit.
 
 ```json
@@ -605,6 +657,7 @@ Rate limit depășit.
 ```
 
 ### 500 - Internal Server Error
+
 Eroare internă server.
 
 ```json
@@ -617,12 +670,14 @@ Eroare internă server.
 ## Validări
 
 ### Utilizator
+
 - **username**: 3-30 caractere, doar litere, cifre și underscore
 - **email**: format email valid
 - **password**: minim 6 caractere, cel puțin o literă mică, mare și o cifră
 - **firstName/lastName**: 2-50 caractere
 
 ### Todo
+
 - **title**: 1-200 caractere (obligatoriu)
 - **description**: maxim 1000 caractere
 - **priority**: low, medium, high, urgent
@@ -633,6 +688,7 @@ Eroare internă server.
 ## Rate Limiting
 
 API-ul implementează rate limiting pentru a preveni abuzul:
+
 - **Limită**: 100 de cereri per 15 minute per IP
 - **Headers**: Include informații despre rate limit în răspunsuri
 
@@ -648,11 +704,13 @@ API-ul implementează rate limiting pentru a preveni abuzul:
 ## Documentația Swagger
 
 Documentația interactivă este disponibilă la:
+
 ```
 http://localhost:3000/api-docs
 ```
 
 Specificația OpenAPI în format JSON:
+
 ```
 http://localhost:3000/api-docs.json
 ```
@@ -698,4 +756,4 @@ JWT_REFRESH_EXPIRES_IN=7d
 RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX_REQUESTS=100
 ALLOWED_ORIGINS=http://localhost:5173,http://localhost:3000
-``` 
+```

@@ -1,6 +1,7 @@
 # 🚀 Todo List API - Backend Modern și Secur
 
-**API modern pentru gestionarea todo-urilor cu autentificare JWT avansată, securitate robustă și CI/CD complet**
+**API modern pentru gestionarea todo-urilor cu autentificare JWT avansată, securitate robustă și
+CI/CD complet**
 
 [![Node.js](https://img.shields.io/badge/Node.js-18.x-green.svg)](https://nodejs.org/)
 [![MongoDB](https://img.shields.io/badge/MongoDB-7.0-blue.svg)](https://www.mongodb.com/)
@@ -13,6 +14,7 @@
 ## 🌟 Caracteristici
 
 ### 🔒 **Securitate Avansată**
+
 - **JWT cu Refresh Tokens** - Autentificare sigură cu reîmprospătare automată
 - **Rate Limiting Avansat** - Protecție împotriva atacurilor brute force
 - **Brute Force Protection** - Detectare și blocare automată
@@ -22,6 +24,7 @@
 - **CORS Configurabil** - Control granular asupra origin-urilor
 
 ### 📊 **Logging și Monitoring**
+
 - **Winston Logger** - Logging structurat cu rotație automată
 - **Security Logging** - Tracking pentru evenimente de securitate
 - **Performance Monitoring** - Detectarea request-urilor lente
@@ -29,23 +32,27 @@
 - **Prometheus + Grafana** - Monitoring complet
 
 ### 🗄️ **Baza de Date și Cache**
+
 - **MongoDB 8.0** - Versiunea cea mai nouă cu validare avansată
 - **Redis** - Cache și session management
 - **Connection Pooling** - Gestionarea eficientă a conexiunilor
 - **Indexuri Optimizate** - Performanță îmbunătățită
 
 ### 🔧 **Validare și Error Handling**
+
 - **Joi Validation** - Validare robustă a datelor cu mesaje în română
 - **Error Handling Centralizat** - Gestionarea consistentă a erorilor
 - **Custom Error Codes** - Coduri de eroare standardizate
 - **Async Error Handling** - Gestionarea automată a erorilor async
 
 ### 📚 **Documentație API**
+
 - **Swagger/OpenAPI 3.0** - Documentație interactivă completă
 - **Endpoint Examples** - Exemple pentru toate endpoint-urile
 - **Schema Validation** - Validare automată a request-urilor
 
 ### 🐳 **Containerizare Completă**
+
 - **Docker Multi-stage Build** - Imagini optimizate pentru producție
 - **Docker Compose** - Dezvoltare locală simplă
 - **Health Checks** - Verificarea stării containerelor
@@ -53,17 +60,20 @@
 - **Nginx Reverse Proxy** - Load balancing și SSL
 
 ### 🧪 **Testing Complet**
+
 - **Jest Configuration** - Testing framework modern
 - **Supertest** - Testing pentru API endpoints
 - **Coverage Reports** - Rapoarte de acoperire
 - **Test Setup** - Configurare automată pentru teste
 
 ### 🔧 **Development Tools**
+
 - **ESLint + Prettier** - Standardizarea codului
 - **Husky + lint-staged** - Git hooks pentru calitatea codului
 - **TypeScript Support** - Generarea tipurilor din Swagger
 
 ### 🚀 **CI/CD Pipeline**
+
 - **GitHub Actions** - Automatizare completă
 - **Multi-environment** - Development, Staging, Production
 - **Automated Testing** - Teste automate la fiecare commit
@@ -170,6 +180,7 @@ npm run test:staging
 ## 📊 Monitoring și Logs
 
 ### **Logs Structurate**
+
 - **Application Logs**: `logs/application-YYYY-MM-DD.log`
 - **Error Logs**: `logs/error-YYYY-MM-DD.log`
 - **HTTP Logs**: `logs/http-YYYY-MM-DD.log`
@@ -177,6 +188,7 @@ npm run test:staging
 - **Performance Logs**: `logs/performance-YYYY-MM-DD.log`
 
 ### **Health Checks**
+
 ```bash
 # Verifică starea API-ului
 curl http://localhost:3000/api/health
@@ -186,6 +198,7 @@ docker-compose ps
 ```
 
 ### **Monitoring Dashboards**
+
 - **Grafana**: http://localhost:3001 (admin/admin123)
 - **Prometheus**: http://localhost:9090
 - **MongoDB Express**: http://localhost:8081 (admin/admin123)
@@ -198,12 +211,14 @@ docker-compose ps
 ### **Workflow-uri GitHub Actions**
 
 #### 1. **Staging Deployment** (`staging.yml`)
+
 - Rulează automat pentru fiecare Pull Request
 - Testează codul cu MongoDB și Redis
 - Build Docker image pentru staging
 - Comentează PR cu informații despre staging
 
 #### 2. **Production Deployment** (`deploy.yml`)
+
 - Rulează automat pentru push pe `main`/`master`
 - Testează codul complet
 - Build și push Docker images
@@ -258,6 +273,7 @@ chmod +x scripts/deploy.sh
 - **Redis Commander**: `http://localhost:8082`
 
 ### **Staging Environment**
+
 - **API Base URL**: `http://localhost:3001/api/v1`
 - **Documentație Swagger**: `http://localhost:3001/api-docs`
 - **MongoDB Express**: `http://localhost:8083` (admin/staging123)
@@ -323,16 +339,19 @@ npm run rollback     # Rollback manual
 ## 🐳 Docker
 
 ### **Development**
+
 ```bash
 docker-compose up -d
 ```
 
 ### **Staging**
+
 ```bash
 docker-compose -f docker-compose.staging.yml up -d
 ```
 
 ### **Production**
+
 ```bash
 docker-compose -f docker-compose.prod.yml up -d
 ```
@@ -382,7 +401,8 @@ Acest proiect este licențiat sub [MIT License](LICENSE).
 
 - **Documentație**: [Wiki](https://github.com/your-username/todo-list-backend/wiki)
 - **Issues**: [GitHub Issues](https://github.com/your-username/todo-list-backend/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/todo-list-backend/discussions)
+- **Discussions**:
+  [GitHub Discussions](https://github.com/your-username/todo-list-backend/discussions)
 
 ---
 
@@ -398,4 +418,4 @@ Acest proiect este licențiat sub [MIT License](LICENSE).
 
 ---
 
-**Construit cu ❤️ pentru aplicații moderne și sigure** 
+**Construit cu ❤️ pentru aplicații moderne și sigure**
