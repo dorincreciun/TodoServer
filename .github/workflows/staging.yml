@@ -1,0 +1,92 @@
+name: Deploy to Staging
+
+on:
+  pull_request:
+    branches: [ main, master ]
+
+env:
+  NODE_VERSION: '18'
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Job pentru testare staging
+  test-staging:
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:7.2-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Create staging environment file
+      run: |
+        cp env.example .env.staging
+        echo "NODE_ENV=staging" >> .env.staging
+        echo "MONGODB_URI=mongodb://localhost:27017/todo-list-staging" >> .env.staging
+        echo "REDIS_URL=redis://localhost:6379/2" >> .env.staging
+        echo "JWT_SECRET=staging-jwt-secret-key-for-staging-purposes-only-minimum-32-characters" >> .env.staging
+        echo "JWT_REFRESH_SECRET=staging-jwt-refresh-secret-key-for-staging-purposes-only-minimum-32-characters" >> .env.staging
+
+    - name: Run linting
+      run: npm run lint
+
+    - name: Run tests
+      run: npm test
+      env:
+        NODE_ENV: staging
+        MONGODB_URI: mongodb://localhost:27017/todo-list-staging
+        REDIS_URL: redis://localhost:6379/2
+
+    - name: Build Docker image for staging
+      run: |
+        docker build -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-${{ github.event.number }} .
+
+    - name: Comment PR with staging info
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `🚀 **Staging Deployment Ready!**
+          
+          **Branch:** \`${{ github.head_ref }}\`
+          **Commit:** \`${{ github.sha }}\`
+          **Docker Image:** \`${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging-${{ github.event.number }}\`
+          
+          **Test Results:** ✅ All tests passed
+          **Linting:** ✅ Code quality checks passed
+          
+          Ready for review and deployment to production!`
+          }) 

@@ -1,0 +1,11 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Rulează linting
+npm run lint
+
+# Rulează testele
+npm test
+
+# Verifică formatarea
+npx prettier --check . 
