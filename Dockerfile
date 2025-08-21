@@ -13,11 +13,11 @@ COPY env.example ./
 
 # Instalează dependențele
 FROM base AS dependencies
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --only=production --ignore-scripts && npm cache clean --force
 
 # Stage pentru development dependencies
 FROM base AS dev-dependencies
-RUN npm ci
+RUN npm ci --ignore-scripts
 
 # Stage pentru build
 FROM dev-dependencies AS build
