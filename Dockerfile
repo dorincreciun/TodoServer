@@ -19,11 +19,6 @@ RUN npm ci --only=production --ignore-scripts && npm cache clean --force
 FROM base AS dev-dependencies
 RUN npm ci --ignore-scripts
 
-# Stage pentru build
-FROM dev-dependencies AS build
-COPY . .
-RUN npm run build
-
 # Stage pentru producție
 FROM node:18-alpine AS production
 
@@ -39,7 +34,7 @@ WORKDIR /app
 
 # Copiază node_modules și fișierele necesare
 COPY --from=dependencies /app/node_modules ./node_modules
-COPY --from=build /app ./
+COPY --from=dev-dependencies /app ./
 
 # Creează directoarele necesare
 RUN mkdir -p logs uploads && \
