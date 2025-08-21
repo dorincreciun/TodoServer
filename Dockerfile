@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Copiază fișierele de configurare
 COPY package*.json ./
-COPY .env.example ./
+COPY env.example ./
 
 # Instalează dependențele
 FROM base AS dependencies
