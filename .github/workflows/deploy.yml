@@ -168,15 +168,8 @@ jobs:
 
             echo "Deployment completed successfully!"
 
-      - name: Notify deployment status
-        uses: 8398a7/action-slack@v3
-        if: always()
-        with:
-          status: ${{ job.status }}
-          channel: '#deployments'
-          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
-        env:
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      # Notificări Slack eliminate pentru a evita erorile de configurare
+      # Slack notifications removed to avoid configuration errors
 
   # Job pentru rollback în caz de eroare
   rollback:

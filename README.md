@@ -79,7 +79,7 @@ CI/CD complet**
 - **Automated Testing** - Teste automate la fiecare commit
 - **Docker Registry** - Imagini Docker automatizate
 - **Rollback Support** - Rollback automat în caz de eroare
-- **Slack Notifications** - Notificări pentru deployment
+- **Slack Notifications** - Notificări pentru deployment (temporar dezactivate)
 
 ---
 
@@ -224,7 +224,7 @@ docker-compose ps
 - Build și push Docker images
 - Deploy automat pe serverul de producție
 - Rollback automat în caz de eroare
-- Notificări Slack
+- Notificări Slack (temporar dezactivate)
 
 ### **Configurare Secrets GitHub**
 
@@ -238,8 +238,8 @@ SSH_KEY=your-private-ssh-key
 PORT=22
 PROJECT_PATH=/opt/todo-list-backend
 
-# Optional: Slack Notifications
-SLACK_WEBHOOK=your-slack-webhook-url
+# Optional: Slack Notifications (eliminat din workflow pentru a evita erorile)
+# SLACK_WEBHOOK=your-slack-webhook-url
 ```
 
 ### **Deployment Manual**
